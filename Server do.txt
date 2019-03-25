@@ -1,52 +1,75 @@
-Главная страница (show):
+== User pages
+Main page (show):
 1. Get запрос на https://localhost:3000 
-2. Роут обрабатывает его и выдает "Home page"
-3. Сервер определяет что должно быть на данной странице и делает выборку из БД (select * from products)
-4. Срабатывает метод show из контроллера products
-5. Сервер помещяет все в HTML темплейт и возвращяет пользоватю.
-6. На стороне пользователя это все рендерится.
+2. Роут обрабатывает запрос, срабатывает в контроллере products метод show
+3. Сервер обрабатывает метод show и даелает выборку из БД (select * from products)
+4. Пользователю возвращяется запрос.
+5. {{id: 1, name: "foo", price: "23.23$", img: "img/products/id1", inserted_at: "#datetime", updated_at: "#datetime"}, {#next product}}
 
-Выбор определенного товара ( show where product id = 1):
-1. Делает запрос https://localhost:3000/product/id1
-2. Срабатывает роут и видим что была запрошена страница из таблицы products
-3. Метод с контроллере products обращяется к БД
+Selected one product ( show where product id = 1):
+1. Пользователь отсылает GET запрос https://localhost:3000/product/id1
+2. Срабатывает роут и видим что была запрошены данные из таблицы products с id1
+3. Метод show в контроллере products обращяется к БД
 4. select id from product where id = 1 
-5. Все столбцы данных которые были получены из БД передаются с HTML темплейт
-6. Запрос возвращяется пользователю и рендерится данный товар.
+5. Пользователю возвращяется запрос POST в JSON формате.
+6. {id: 1, name: "foo", price: "23.23$", img: "img/products/id1", inserted_at: "#datetime", updated_at: "#datetime"}
 
-Добавления товара (.new method as admin):
-1. Вызывается метод create из контроллера products.
-2. Срабатывает роут и проверяет есть ли такой путь.
-3. Срабатывает коллбек который вызывает следующий метод "admin?"
-4. Метод "admin?" определяет %username% по его id 
-5. Cмотрит есть ли у него права админа в таблице user в колонке admin.
-5.1 Если нет роут возвращяет метод POST с главной страницей https://localhost:3000
-5.2 Если права есть роут возвращяет POST с HTML темлейтом для создания нового товара (localhost:3000/new)
-6. После обработки запроса в контроллере срабатывает метод save 
-7. insert into product (<name>, <price>, <thumbnail>, <img>) values (<value1>, <value2>...)
-8. После успешного создания товара роутим админа на данный товар с этим id.
-
-Удаление товара (destroy method):
-1. Вызывается метод destroy на каком-то товаре.
-2. Роут смотрит есть ли такой путь у него.
-3. Срабатывает коллбек на проверку админа. Если все ок идем дальше, если нет роутим пользователя на главную.
-4. Срабатывает коллбек :before_action для подверждения.
-5. Метод destroy ищет в БД id товара.
-6. desrtoy product where id=5
-7. Роутим админа на главную с сообщением что данный товар удалился.
-
-favorite page:
-1. Срабатывает роут на проверку есть ли такой путь.
+== Favorite page
+Favorite page:
+1. GET запрос на Favorite_user_page
+2. route файл смотрит на запрос Favorites#show
 2. Метод show из контроллера favorites, обращяется к БД.
 3. select * from favorites where user_id = 1
-4. Все собранные данные помещяются в HTML темлпет и возвращяется пользователю.
+4. Все собранные данные возвращяются пользователю в JSON формате.
+5. { user_id = 1, products: {{#product 1}, {#product2}}}
 
-add to favorites:
-1. Роут проверяет наличие пути FavoritesConroller#add => method post
-2. insert into favorite (<product_id>) where (<user_id>) ???
-3. JSON возвращяет сообщение о добавления товара в избранное.
+Add to favorites:
+1. Роут файл обрабатывает POST запрос.
+2. Роут проверяет наличие пути FavoritesConroller#add 
+3. В контроллере срабатывает метод create.
+4. Все данные о товаре передаются в БД.
+5. insert into favorite (<product_id>) where (<user_id>) ???
+6. JSON возвращяет сообщение о добавления товара в избранное.
 
 delete from favorites:
-1. Роут проверяет наличие пути FavoritesController#destroy => destroy method
-2. destroy product_id from favorites where user_id = 1
-3. JSON возвращяет сообщение об удалении товара из избранного.
+1. Роут проверяет наличие пути favorites#destroy
+2. Из контроллера favorites вызывается destroy метод.
+3. destroy product_id from favorites where user_id = 1
+4. JSON возвращяет сообщение об удалении товара из избранного.
+
+== As admin user
+
+Add product (/product/new method as admin):
+1. Срабатывает роут на добавление нового товара /product/new, метод GET
+2. Экшн контроллер product#new
+3. Срабатывает коллбек в контроллере products который вызывает следующий метод "admin?"
+4. Метод "admin?" определяет %username% по его id 
+5. Проверяем есть ли у него права админа 
+6. В таблице user в колонке admin параметр TRUE / FALSE
+6.1 Если FALSE => роут возвращяет метод POST с главной страницей https://localhost:3000
+6.2 Если TRUE  => есть роут возвращяет POST с HTML темлейтом для создания нового товара (localhost:3000/new)
+7. После обработки запроса в контроллере срабатывает метод save который все данные передает в БД
+8. insert into product (<name>, <price>, <img>) values (<value1>, <value2>...)
+9. После успешного создания товара роутим админа на этот товар с id#.
+
+Destroy product (destroy method):
+1. Вызывается метод destroy на каком-то товаре.
+2. Экшн контроллер products#destroy
+3. Роут проверяет путь /products/id#.
+4. Срабатывает коллбек на проверку админа. Если admin == true идем дальше, если false роутим пользователя на главную.
+5. Срабатывает коллбек :before_action для подверждения.
+6. Метод destroy из контроллера products ищет в БД id товара который мы ему передали.
+7. desrtoy product where id=5
+8. Роутим админа с сообщением что данный товар удалился.
+
+Edit method:
+1. HTTP method 		=> PATCH
+2. Route 		=> /products
+3. Controller action 	=> products#edit
+4. Return JSON with data.
+5. Parse JSON.
+6. Instert data into html template.
+7. Admin edit product.
+8. Save product.
+9. All data in JSON format inserted into DB.
+10. Route admin to home page, with msg "Edited"
