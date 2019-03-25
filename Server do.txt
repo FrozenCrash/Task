@@ -1,75 +1,218 @@
-== User pages
-Main page (show):
-1. Get запрос на https://localhost:3000 
-2. Роут обрабатывает запрос, срабатывает в контроллере products метод show
-3. Сервер обрабатывает метод show и даелает выборку из БД (select * from products)
-4. Пользователю возвращяется запрос.
-5. {{id: 1, name: "foo", price: "23.23$", img: "img/products/id1", inserted_at: "#datetime", updated_at: "#datetime"}, {#next product}}
+# Implementation plans
 
-Selected one product ( show where product id = 1):
-1. Пользователь отсылает GET запрос https://localhost:3000/product/id1
-2. Срабатывает роут и видим что была запрошены данные из таблицы products с id1
-3. Метод show в контроллере products обращяется к БД
-4. select id from product where id = 1 
-5. Пользователю возвращяется запрос POST в JSON формате.
-6. {id: 1, name: "foo", price: "23.23$", img: "img/products/id1", inserted_at: "#datetime", updated_at: "#datetime"}
+## As a user, I see a list of products with thumbnails
 
-== Favorite page
-Favorite page:
-1. GET запрос на Favorite_user_page
-2. route файл смотрит на запрос Favorites#show
-2. Метод show из контроллера favorites, обращяется к БД.
-3. select * from favorites where user_id = 1
-4. Все собранные данные возвращяются пользователю в JSON формате.
-5. { user_id = 1, products: {{#product 1}, {#product2}}}
+1. have a `ProductsController` on the server,
+2. have a `index` action in the `ProductsController` controller,
+3. have a `GET /products` route on the server, that resolves to `ProductsController#index` action,
+4. issue a `GET /products` to the server,
+5. in controller action, make a query using ActiveRecord to select all products from the database:
 
-Add to favorites:
-1. Роут файл обрабатывает POST запрос.
-2. Роут проверяет наличие пути FavoritesConroller#add 
-3. В контроллере срабатывает метод create.
-4. Все данные о товаре передаются в БД.
-5. insert into favorite (<product_id>) where (<user_id>) ???
-6. JSON возвращяет сообщение о добавления товара в избранное.
+    ```sql
+    select * from products where visible = true;
+    ```
 
-delete from favorites:
-1. Роут проверяет наличие пути favorites#destroy
-2. Из контроллера favorites вызывается destroy метод.
-3. destroy product_id from favorites where user_id = 1
-4. JSON возвращяет сообщение об удалении товара из избранного.
+6. render products back in response in JSON format:
 
-== As admin user
+# As a user, I see a single product with details
 
-Add product (/product/new method as admin):
-1. Срабатывает роут на добавление нового товара /product/new, метод GET
-2. Экшн контроллер product#new
-3. Срабатывает коллбек в контроллере products который вызывает следующий метод "admin?"
-4. Метод "admin?" определяет %username% по его id 
-5. Проверяем есть ли у него права админа 
-6. В таблице user в колонке admin параметр TRUE / FALSE
-6.1 Если FALSE => роут возвращяет метод POST с главной страницей https://localhost:3000
-6.2 Если TRUE  => есть роут возвращяет POST с HTML темлейтом для создания нового товара (localhost:3000/new)
-7. После обработки запроса в контроллере срабатывает метод save который все данные передает в БД
-8. insert into product (<name>, <price>, <img>) values (<value1>, <value2>...)
-9. После успешного создания товара роутим админа на этот товар с id#.
+1. have a `ProductsController` on the server,
+2. have a `show` action in the `ProductsController` controller,
+3. have a `GET /products/:id` route on the server, that resolves to `ProductsController#show` action,
+4. issue a `GET /products/:id` to the server,
+5. in controller action, make a query using ActiveRecord to select all single product from the database:
 
-Destroy product (destroy method):
-1. Вызывается метод destroy на каком-то товаре.
-2. Экшн контроллер products#destroy
-3. Роут проверяет путь /products/id#.
-4. Срабатывает коллбек на проверку админа. Если admin == true идем дальше, если false роутим пользователя на главную.
-5. Срабатывает коллбек :before_action для подверждения.
-6. Метод destroy из контроллера products ищет в БД id товара который мы ему передали.
-7. desrtoy product where id=5
-8. Роутим админа с сообщением что данный товар удалился.
+    ```sql
+    select * from products where id = :id;
+    ```
 
-Edit method:
-1. HTTP method 		=> PATCH
-2. Route 		=> /products
-3. Controller action 	=> products#edit
-4. Return JSON with data.
-5. Parse JSON.
-6. Instert data into html template.
-7. Admin edit product.
-8. Save product.
-9. All data in JSON format inserted into DB.
-10. Route admin to home page, with msg "Edited"
+6. render product back in response in JSON format:
+
+    ```json
+    [
+      {
+        "title": "Some new product",
+        "price": "12.76",
+        "image": "https://placeimg.com/640/480"
+      },
+      {
+        "title": "Some new product",
+        "price": "41.76",
+        "image": "https://placeimg.com/640/480"
+      }
+    ]
+    ```
+
+## As a logged in user, I add a product to the list my favorite products
+
+1. have a `FavoritesController` on the server,
+2. have a `create` action in the `FavoritesController` controller,
+3. have a `POST /products/:id/favorite` route on the server, that resolves to `FavoritesController#create` action,
+4. have a `before_action :authorize_user` to authorize user,
+5. issue a `POST /products/:id/favorite` to the server,
+6. in DB create record in `favorites` table:
+
+    ```sql
+    insert into favorites (id, product_id, user_id, ...) values (123, :id, ...)
+    ```
+
+7. render back empty response with `200` response code.
+
+## As a logged in user, I remove a product from the list my favorite products
+
+1. have a `FavoritesController` on the server,
+2. have a `destroy` action in the `FavoritesController` controller,
+3. have a `DELETE /products/:id/unfavorite` route on the server, that resolves to `FavoritesController#destroy` action,
+4. have a `before_action :authorize_user` to authorize user,
+5. issue a `DELETE /products/:id/unfavorite` to the server,
+6. delete record from `favorites` table:
+
+    ```sql
+    delete from favorites where product_id = :id and user_id = :user_id;
+    ```
+
+7. render back empty response with `202` response code.
+
+## As a logged in user, I see a list of my favorite products
+
+1. have a `FavoritesController` on the server,
+2. have a `index` action in the `FavoritesController` controller,
+3. have a `GET /favorites` route on the server, that resolves to `FavoritesController#index` action,
+4. have a `before_action :authorize_user` to authorize user,
+5. issue a `GET /favorites` to the server,
+6. get all favorite products from database:
+
+    ```sql
+    select * from favorites ... where user_id = :user_id;
+    ```
+
+7. render product back in response in JSON format:
+
+    ```json
+    [
+      {
+        "product": {
+          "id": 1,
+          "title": "",
+          "price": "",
+          "image": ""
+        },
+        "inserted_at": "2019-03-25T22:41:03.112963"
+      },
+      {
+        "product": {
+          "id": 2,
+          "title": "",
+          "price": "",
+          "image": ""
+        },
+        "inserted_at": "2019-03-25T22:41:03.112963"
+      }
+    ]
+    ```
+
+## As an admin, I see all products
+
+1. have a `ProductsController` on the server,
+2. have a `index` action in the `ProductsController` controller,
+3. have a `GET /products` route on the server, that resolves to `ProductsController#index` action,
+4. have a `before_action :authorize_user` to authorize user,
+5. have a `before_action :authenticate_admin` to confirm is an admin,
+6. issue a `GET /products` to the server,
+7. in controller action, make a query using ActiveRecord to select all visible products from the database:
+
+    ```sql
+    select * from products;
+    ```
+
+8. render product back in response in JSON format:
+
+    ```json
+    [
+      {
+        "id": 123,
+        "title": "Some new product",
+        "price": "12.76",
+        "image": "https://placeimg.com/640/480",
+        "visible": true
+      },
+      {
+        "id": 123,
+        "title": "Some new product",
+        "price": "41.76",
+        "image": "https://placeimg.com/640/480",
+        "visible": false
+      }
+    ]
+    ```
+
+## As an admin, I add a product
+
+1. have a `ProductsController` on the server,
+2. have a `create` action in the `ProductsController` controller,
+3. have a `POST /products` route on the server, that resolves to `ProductsController#create` action,
+4. have a `before_action :authorize_user` to authorize user,
+5. have a `before_action :authenticate_admin` to confirm is an admin,
+6. issue a `POST /products` to the server with the following request body:
+
+    ```json
+    {
+      "product": {
+        "title": "Some new product",
+        "price": "12.76",
+        "image": "https://placeimg.com/640/480"
+      }
+    }
+    ```
+
+6. in controller action, make a query using ActiveRecord to save product to the database:
+
+    ```sql
+    insert into products ...
+    ```
+
+7. render product back in response in JSON, with response code `201`:
+
+    ```json
+    {
+      "product": {
+        "id": 123,
+        "title": "Some new product",
+        "price": "12.76",
+        "image": "https://placeimg.com/640/480",
+        "created_at": "2019-03-24T18:25:43.511Z",
+      }
+    }
+    ```
+
+## As an admin, I remove a product
+
+1. have a `ProductsController` on the server,
+2. have a `destoy` action in the `ProductsController` controller,
+3. have a `DELETE /products/:id` route on the server, that resolves to `ProductsController#destoy` action,
+4. have a `before_action :authorize_user` to authorize user,
+5. have a `before_action :authenticate_admin` to confirm is an admin,
+6. issue a `DELETE /products/:id` to the server:
+7. in controller action, make a query using ActiveRecord to save product to the database:
+
+    ```sql
+    delete from products where id = :id;
+    ```
+
+8. render back empty response with `202` response code.
+
+## As an admin, I update a product
+
+1. have a `ProductsController` on the server,
+2. have a `update` action in the `ProductsController` controller,
+3. have a `PATCH /products/:id` route on the server, that resolves to `ProductsController#update` action,
+4. have a `before_action :authorize_user` to authorize user,
+5. have a `before_action :authenticate_admin` to confirm is an admin,
+6. issue a `PATCH /products/:id` to the server:
+7. in controller action, make a query using ActiveRecord to save product to the database:
+
+    ```sql
+    update products set ... where id = :id;
+    ```
+
+8. render back empty response with `204` response code.
