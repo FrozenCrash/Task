@@ -165,11 +165,13 @@
     }
     ```
 
-6. in controller action, make a query using ActiveRecord to save product to the database:
+6. in controller action:
+    * **yes** make a query using ActiveRecord to save product to the database:
 
     ```sql
     insert into products ...
     ```
+    * **no**: return empty response body with `404` error code.
 
 7. render product back in response in JSON, with response code `201`:
 
@@ -193,8 +195,15 @@
 4. have a `before_action :authorize_user` to authorize user,
 5. have a `before_action :authenticate_admin` to confirm is an admin,
 6. issue a `DELETE /products/:id` to the server:
-7. in controller action, make a query using ActiveRecord to save product to the database:
+7. in controller action:
 
+    *make a query using ActiveRecord to delete product from the database:*
+    **1.**
+    ```sql
+    delete * from favorite where product_id = :id
+    ```
+
+    **2.**
     ```sql
     delete from products where id = :id;
     ```
@@ -209,10 +218,12 @@
 4. have a `before_action :authorize_user` to authorize user,
 5. have a `before_action :authenticate_admin` to confirm is an admin,
 6. issue a `PATCH /products/:id` to the server:
-7. in controller action, make a query using ActiveRecord to save product to the database:
+7. in controller action:
+    * **yes** make a query using ActiveRecord to save product to the database:
 
     ```sql
     update products set ... where id = :id;
     ```
+    * **no**: return empty response body with `404` error code.
 
 8. render back empty response with `204` response code.
