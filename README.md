@@ -28,7 +28,7 @@ Product constitutes of the following information:
 
 Without doing any coding, do the following:
 
-1. ~Define & draw basic UI mockups: which screens will be available in the app~,
+1. ~Define & draw basic UI mockups: which screens will be available in the app~ we will stick to building an API for now,
 2. Define & draw basic DB schema: which tables & columns do you believe are required,
 3. Describe user stories above in technical terms, be as detailed as you believe is necessary.
 
