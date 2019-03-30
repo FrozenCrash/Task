@@ -237,23 +237,18 @@
 5. have a `before_action :authenticate_admin` to confirm is an admin,
 6. issue a `PATCH /products/:id` to the server:
 7. in controller action:
-    * **yes** make a query using ActiveRecord to update product to the database:
+    
+   ```
+   if current user is **admin**:
+      validate product
 
-    ```sql
-    update products set ... where id = :id;
-    ```
+      if product valid:
+         update product in database         
+         return response with 204 code
 
-    * **no**: return empty response body with `404` error code.
+      if product is not valid:
+         return response with 422 code and validation errors in response body
 
-      **Hide product:**
-
-    * **yes** make a query using ActiveRecord to hide product to the database:
-
-      ```sql
-      update products set hide = true where id = :id;
-      delete * from favorite where product_id = :id;
-      ```
-
-    * **no**: return empty response body with `404` error code.
-
-8. render back empty response with `204` response code.
+   if current user is not **admin**:
+      return 404 response with empty response body
+   ```
