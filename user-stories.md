@@ -8,16 +8,17 @@
 4. issue a `GET /products` to the server,
 5. in controller action, make a query using ActiveRecord to select all products from the database:
 
-    * **User** rigths:
-    ```sql
-    select * from products where visible = true;
-    ```
+    * current user is **not admin**:
+    
+         ```sql
+         select * from products where visible = true;
+         ```
 
-    * **Admin** rights:
-    ```sql
-    select * from products;
-    ```
-
+    * current user is **admin**:
+    
+         ```sql
+         select * from products;
+         ```
 
 6. render products back in response in JSON format:
 
@@ -52,12 +53,17 @@
 3. have a `POST /products/:id/favorite` route on the server, that resolves to `FavoritesController#create` action,
 4. have a `before_action :authorize_user` to authorize user,
 5. issue a `POST /products/:id/favorite` to the server,
-6. in DB create record in `favorites` table
-    * **yes**
+6. in DB create record in `favorites` table:
+
+    * **yes**:
+    
     ```sql
     insert into favorites (id, product_id, user_id, ...) values (123, :id, ...)
     ```
-    * **no**: response to user error code `404`
+    
+    * **no**:
+    
+    response to user with error code `404`
 
 7. render back empty response with `200` response code.
 
@@ -70,7 +76,8 @@
 5. issue a `DELETE /products/:id/unfavorite` to the server,
 6. delete record from `favorites` table:
     
-    * **yes** make a query to the DB 
+    * **yes** make a query to the DB:
+    
     ```sql
     delete from favorites where product_id = :id and user_id = :user_id;
     ```
@@ -184,6 +191,7 @@
     ```sql
     insert into products ...
     ```
+    
     **no**: return empty response body with `404` error code.
 
 7. render product back in response in JSON, with response code `201`:
