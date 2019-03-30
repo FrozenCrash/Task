@@ -233,12 +233,12 @@
 1. have a `ProductsController` on the server,
 2. have a `update` action in the `ProductsController` controller,
 3. have a `PATCH /products/:id` route on the server, that resolves to `ProductsController#update` action,
-4. have a `before_action :authorize_user` to authorize user,
-5. have a `before_action :authenticate_admin` to confirm is an admin,
-6. issue a `PATCH /products/:id` to the server:
-7. in controller action:
+4. issue a `PATCH /products/:id` to the server:
+5. in controller action:
     
    ```
+   load current user
+   
    if current user is **admin**:
       validate product
 
