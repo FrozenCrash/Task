@@ -240,6 +240,8 @@
    load current user
    
    if current user is **admin**:
+      load product
+      apply new product params
       validate product
 
       if product valid:
