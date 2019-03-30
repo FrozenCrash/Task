@@ -22,7 +22,7 @@
 
 6. render products back in response in JSON format:
 
-# As a user, I see a single product with details
+## As a user, I see a single product with details
 
 1. have a `ProductsController` on the server,
 2. have a `show` action in the `ProductsController` controller,
