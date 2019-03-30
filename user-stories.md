@@ -242,14 +242,18 @@
    if user exists?
       if current user is admin?
          load product
-         apply new product params
-         validate product
+         
+         if product loaded?
+            apply new product params
+            validate product
 
-         if product valid?
-            update product in database         
-            return response with 204 code
+            if product valid?
+               update product in database         
+               return response with 204 code
+            else
+               return response with 422 code and validation errors in response body
          else
-            return response with 422 code and validation errors in response body
+            return 404 response with empty response body
       else
          return 404 response with empty response body
    else
