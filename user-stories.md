@@ -240,21 +240,18 @@
    load current user
    
    if user exists?
-      if current user is **admin**:
+      if current user is admin?
          load product
          apply new product params
          validate product
 
-         if product valid:
+         if product valid?
             update product in database         
             return response with 204 code
-
-         if product is not valid:
+         else
             return response with 422 code and validation errors in response body
-
-      if current user is not **admin**:
+      else
          return 404 response with empty response body
-         
-   if user does not exist
+   else
       return 404 response with empty response body
    ```
