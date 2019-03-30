@@ -8,9 +8,16 @@
 4. issue a `GET /products` to the server,
 5. in controller action, make a query using ActiveRecord to select all products from the database:
 
+    * **User** rigths:
     ```sql
     select * from products where visible = true;
     ```
+
+    * **Admin** rights:
+    ```sql
+    select * from products;
+    ```
+
 
 6. render products back in response in JSON format:
 
@@ -23,7 +30,7 @@
 5. in controller action, make a query using ActiveRecord to select all single product from the database:
 
     ```sql
-    select * from products where id = :id;
+    select * from products where id = :id AND visible = true;
     ```
 
 6. render product back in response in JSON format:
@@ -33,11 +40,6 @@
       {
         "title": "Some new product",
         "price": "12.76",
-        "image": "https://placeimg.com/640/480"
-      },
-      {
-        "title": "Some new product",
-        "price": "41.76",
         "image": "https://placeimg.com/640/480"
       }
     ]
@@ -50,11 +52,12 @@
 3. have a `POST /products/:id/favorite` route on the server, that resolves to `FavoritesController#create` action,
 4. have a `before_action :authorize_user` to authorize user,
 5. issue a `POST /products/:id/favorite` to the server,
-6. in DB create record in `favorites` table:
-
+6. in DB create record in `favorites` table
+    * **yes**
     ```sql
     insert into favorites (id, product_id, user_id, ...) values (123, :id, ...)
     ```
+    * **no**: response to user error code `404`
 
 7. render back empty response with `200` response code.
 
@@ -66,10 +69,13 @@
 4. have a `before_action :authorize_user` to authorize user,
 5. issue a `DELETE /products/:id/unfavorite` to the server,
 6. delete record from `favorites` table:
-
+    
+    * **yes** make a query to the DB 
     ```sql
     delete from favorites where product_id = :id and user_id = :user_id;
     ```
+
+    * **no**: return empty response body with `404` error code.
 
 7. render back empty response with `202` response code.
 
@@ -165,13 +171,20 @@
     }
     ```
 
-6. in controller action:
-    * **yes** make a query using ActiveRecord to save product to the database:
+6. Before next step we must to check:
+    * Price < 0
+    * Product have title
+    * Product have image
+    * Unique title
+    * Extansion image must be "jpeg"
+    * Correct image URL
+     
+    **yes** make a query using ActiveRecord to save product to the database:
 
     ```sql
     insert into products ...
     ```
-    * **no**: return empty response body with `404` error code.
+    **no**: return empty response body with `404` error code.
 
 7. render product back in response in JSON, with response code `201`:
 
@@ -197,16 +210,13 @@
 6. issue a `DELETE /products/:id` to the server:
 7. in controller action:
 
-    *make a query using ActiveRecord to delete product from the database:*
-    **1.**
+    **yes**: make a query using ActiveRecord to delete product from the database:
     ```sql
+    delete * from product where id = :id
     delete * from favorite where product_id = :id
     ```
 
-    **2.**
-    ```sql
-    delete from products where id = :id;
-    ```
+    **no**: return empty response body with `404` error code.
 
 8. render back empty response with `202` response code.
 
@@ -219,11 +229,23 @@
 5. have a `before_action :authenticate_admin` to confirm is an admin,
 6. issue a `PATCH /products/:id` to the server:
 7. in controller action:
-    * **yes** make a query using ActiveRecord to save product to the database:
+    * **yes** make a query using ActiveRecord to update product to the database:
 
     ```sql
     update products set ... where id = :id;
     ```
+
+    * **no**: return empty response body with `404` error code.
+
+      **Hide product:**
+
+    * **yes** make a query using ActiveRecord to hide product to the database:
+
+      ```sql
+      update products set hide = true where id = :id;
+      delete * from favorite where product_id = :id;
+      ```
+
     * **no**: return empty response body with `404` error code.
 
 8. render back empty response with `204` response code.
