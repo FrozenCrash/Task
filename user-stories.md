@@ -129,34 +129,32 @@
 1. have a `ProductsController` on the server,
 2. have a `index` action in the `ProductsController` controller,
 3. have a `GET /products` route on the server, that resolves to `ProductsController#index` action,
-4. have a `before_action :authorize_user` to authorize user,
-5. have a `before_action :authenticate_admin` to confirm is an admin,
-6. issue a `GET /products` to the server,
-7. in controller action, make a query using ActiveRecord to select all visible products from the database:
+4. 
 
-    ```sql
-    select * from products;
     ```
-
-8. render product back in response in JSON format:
-
-    ```json
-    [
-      {
-        "id": 123,
-        "title": "Some new product",
-        "price": "12.76",
-        "image": "https://placeimg.com/640/480",
-        "visible": true
-      },
-      {
-        "id": 123,
-        "title": "Some new product",
-        "price": "41.76",
-        "image": "https://placeimg.com/640/480",
-        "visible": false
-      }
-    ]
+    load current user
+       
+    if user exists?
+      if current user is admin?
+        load all products
+        return response with 204 code with following response:
+          {
+            "product": {
+              "id": 123,
+              "title": "Some new product",
+              "price": "12.76",
+              "image": "https://placeimg.com/640/480",
+              "created_at": "2019-03-24T18:25:43.511Z"
+              },
+              {
+                ...
+              }
+            }
+          }
+      else
+        load products with parameter hide = false
+    else
+      load products with parameter hide = false
     ```
 
 ## As an admin, I add a product
@@ -164,48 +162,27 @@
 1. have a `ProductsController` on the server,
 2. have a `create` action in the `ProductsController` controller,
 3. have a `POST /products` route on the server, that resolves to `ProductsController#create` action,
-4. have a `before_action :authorize_user` to authorize user,
-5. have a `before_action :authenticate_admin` to confirm is an admin,
-6. issue a `POST /products` to the server with the following request body:
-
-    ```json
-    {
-      "product": {
-        "title": "Some new product",
-        "price": "12.76",
-        "image": "https://placeimg.com/640/480"
-      }
-    }
+4. in controller action:
     ```
-
-6. Before next step we must to check:
-    * Price < 0
-    * Product have title
-    * Product have image
-    * Unique title
-    * Extansion image must be "jpeg"
-    * Correct image URL
-     
-    **yes** make a query using ActiveRecord to save product to the database:
-
-    ```sql
-    insert into products ...
-    ```
-    
-    **no**: return empty response body with `404` error code.
-
-7. render product back in response in JSON, with response code `201`:
-
-    ```json
-    {
-      "product": {
-        "id": 123,
-        "title": "Some new product",
-        "price": "12.76",
-        "image": "https://placeimg.com/640/480",
-        "created_at": "2019-03-24T18:25:43.511Z",
-      }
-    }
+    load current user
+   
+    if user exists?
+      if current user is admin?
+        if all validates is true
+          * price product valid (price > 0) ?
+          * title product uniq?
+          * product have image (extansion image must be "jpeg") ? 
+          * correct image URL?
+          create new product
+        else
+          return response with 422 code and validation errors in response body:
+              {
+                ...
+              }
+      else
+        return 404 (401 - Unauthorized) response with empty response body
+    else
+      return 404 (403 - Forbidden) response with empty response body 
     ```
 
 ## As an admin, I remove a product
@@ -213,20 +190,26 @@
 1. have a `ProductsController` on the server,
 2. have a `destoy` action in the `ProductsController` controller,
 3. have a `DELETE /products/:id` route on the server, that resolves to `ProductsController#destoy` action,
-4. have a `before_action :authorize_user` to authorize user,
-5. have a `before_action :authenticate_admin` to confirm is an admin,
-6. issue a `DELETE /products/:id` to the server:
-7. in controller action:
-
-    **yes**: make a query using ActiveRecord to delete product from the database:
-    ```sql
-    delete * from product where id = :id
-    delete * from favorite where product_id = :id
+4. issue a `DELETE /products/:id` to the server:
+5. in controller action:
+    
     ```
+    load current user
+   
+    if user exists?
+      if current user is admin?
+        load product 
 
-    **no**: return empty response body with `404` error code.
-
-8. render back empty response with `202` response code.
+        if product loaded?
+          delete product
+          return 200 code response 
+        else
+          return 404 response with empty response body
+      else
+        return 404 response with empty response body
+    else
+      return 404 response with empty response body
+    ```
 
 ## As an admin, I update a product
 
@@ -241,34 +224,34 @@
    
    if user exists?
       if current user is admin?
-         load product
+        load product
          
-         if product loaded?
-            apply new product params
-            validate product
+        if product loaded?
+          apply new product params
+          validate product
 
-            if product valid?
-               update product in database         
-               return response with 204 code with following response:
-               {
-                 "product": {
-                   "id": 123,
-                   "title": "Some new product",
-                   "price": "12.76",
-                   "image": "https://placeimg.com/640/480",
-                   "created_at": "2019-03-24T18:25:43.511Z"
-                 }
-               }
+          if product valid?
+            update product in database         
+            return response with 204 code with following response:
+              {
+                "product": {
+                  "id": 123,
+                  "title": "Some new product",
+                  "price": "12.76",
+                  "image": "https://placeimg.com/640/480",
+                  "created_at": "2019-03-24T18:25:43.511Z"
+                }
+              }
 
-            else
-               return response with 422 code and validation errors in response body:
-               {
-                 ...
-               }
-         else
-            return 404 response with empty response body
+          else
+            return response with 422 code and validation errors in response body:
+              {
+                ...
+              }
+        else
+          return 404 response with empty response body
       else
-         return 404 response with empty response body
-   else
+        return 404 response with empty response body
+    else
       return 404 response with empty response body
    ```
