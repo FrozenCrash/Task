@@ -51,85 +51,81 @@
 1. have a `FavoritesController` on the server,
 2. have a `create` action in the `FavoritesController` controller,
 3. have a `POST /products/:id/favorite` route on the server, that resolves to `FavoritesController#create` action,
-4. have a `before_action :authorize_user` to authorize user,
-5. issue a `POST /products/:id/favorite` to the server,
-6. in DB create record in `favorites` table:
+4. in controller action:
+  ```
+  load current user
+  
+  if user exists?
+    load product
 
-    * **yes**:
-    
-    ```sql
-    insert into favorites (id, product_id, user_id, ...) values (123, :id, ...)
-    ```
-    
-    * **no**:
-    
-    response to user with error code `404`
-
-7. render back empty response with `200` response code.
+    if product loaded?
+      save product in user favorite list
+    else
+      return 404 response with empty response body
+  else
+    return 404 response with empty response body 
+  ```
 
 ## As a logged in user, I remove a product from the list my favorite products
 
 1. have a `FavoritesController` on the server,
 2. have a `destroy` action in the `FavoritesController` controller,
 3. have a `DELETE /products/:id/unfavorite` route on the server, that resolves to `FavoritesController#destroy` action,
-4. have a `before_action :authorize_user` to authorize user,
-5. issue a `DELETE /products/:id/unfavorite` to the server,
-6. delete record from `favorites` table:
+4. in controller action:
     
-    * **yes** make a query to the DB:
-    
-    ```sql
-    delete from favorites where product_id = :id and user_id = :user_id;
-    ```
+  ```
+  load current user
+   
+  if user exists?
+    load product from user favorite list
 
-    * **no**: return empty response body with `404` error code.
-
-7. render back empty response with `202` response code.
+    if product loaded?
+      delete product
+      return 200 code response 
+    else
+      return 404 response with empty response body
+  else
+    return 404 response with empty response body
+  ```
 
 ## As a logged in user, I see a list of my favorite products
 
 1. have a `FavoritesController` on the server,
 2. have a `index` action in the `FavoritesController` controller,
 3. have a `GET /favorites` route on the server, that resolves to `FavoritesController#index` action,
-4. have a `before_action :authorize_user` to authorize user,
-5. issue a `GET /favorites` to the server,
-6. get all favorite products from database:
-
-    ```sql
-    select * from favorites ... where user_id = :user_id;
-    ```
-
-7. render product back in response in JSON format:
-
-    ```json
-    [
-      {
-        "product": {
-          "id": 1,
-          "title": "",
-          "price": "",
-          "image": ""
-        },
-        "inserted_at": "2019-03-25T22:41:03.112963"
-      },
-      {
-        "product": {
-          "id": 2,
-          "title": "",
-          "price": "",
-          "image": ""
-        },
-        "inserted_at": "2019-03-25T22:41:03.112963"
-      }
-    ]
-    ```
+4. in controller action:
+  
+  ```
+  load current user
+       
+  if user exists?
+    if user have favorite products
+      load all visible products from user favorites
+      return response with 204 code with following response:
+        {
+          "product": {
+            "id": 123,
+            "title": "Some new product",
+            "price": "12.76",
+            "image": "https://placeimg.com/640/480",
+            "created_at": "2019-03-24T18:25:43.511Z"
+            },
+            {
+              ...
+            }
+        }
+    else
+      return 404 response with empty response body
+  else
+    return 404 response with empty response body
+  ```
 
 ## As an admin, I see all products
 
 1. have a `ProductsController` on the server,
 2. have a `index` action in the `ProductsController` controller,
 3. have a `GET /products` route on the server, that resolves to `ProductsController#index` action,
-4. 
+4. In controller action:
 
     ```
     load current user
@@ -149,7 +145,6 @@
               {
                 ...
               }
-            }
           }
       else
         load products with parameter hide = false
