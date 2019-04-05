@@ -5,20 +5,15 @@
 1. have a `ProductsController` on the server,
 2. have a `index` action in the `ProductsController` controller,
 3. have a `GET /products` route on the server, that resolves to `ProductsController#index` action,
-4. issue a `GET /products` to the server,
-5. in controller action, make a query using ActiveRecord to select all products from the database:
-
-    * current user is **not admin**:
-    
-         ```sql
-         select * from products where visible = true;
-         ```
-
-    * current user is **admin**:
-    
-         ```sql
-         select * from products;
-         ```
+4. in controller action:
+  ```
+  select all visible products
+  
+  if visible products > 0 
+    load products
+  else
+    return 404 response with empty response body
+  ```
 
 6. render products back in response in JSON format:
 
@@ -27,24 +22,25 @@
 1. have a `ProductsController` on the server,
 2. have a `show` action in the `ProductsController` controller,
 3. have a `GET /products/:id` route on the server, that resolves to `ProductsController#show` action,
-4. issue a `GET /products/:id` to the server,
-5. in controller action, make a query using ActiveRecord to select all single product from the database:
-
-    ```sql
-    select * from products where id = :id AND visible = true;
-    ```
-
-6. render product back in response in JSON format:
-
-    ```json
-    [
-      {
+4. in controller action:
+  
+  ```
+  select visible product
+  if product loaded?
+    load product details
+    return response with 204 code with following response:
+    {
+      "product": {
+        "id": 123,
         "title": "Some new product",
         "price": "12.76",
-        "image": "https://placeimg.com/640/480"
-      }
-    ]
-    ```
+        "image": "https://placeimg.com/640/480",
+        "created_at": "2019-03-24T18:25:43.511Z"
+        }
+    }
+  else
+    return 404 response with empty response body
+  ```
 
 ## As a logged in user, I add a product to the list my favorite products
 
