@@ -10,9 +10,9 @@
   ```
   select all visible products
   
-  if visible products > 0 
-    load products
-    return response with 204 code with following response:
+  load products
+  return response with 204 code with following response:
+  [
     {
       "product": {
         "id": 123,
@@ -25,8 +25,9 @@
           ...
         }
     }
-  else
-    return 404 response with empty response body
+  ]
+  if products < 1
+    return 200 response with empty response body {}
   ```
 
 ## As a user, I see a single product with details
@@ -38,20 +39,17 @@
   
   ```
   select visible product
-  if product loaded?
-    load product details
-    return response with 204 code with following response:
-    {
-      "product": {
-        "id": 123,
-        "title": "Some new product",
-        "price": "12.76",
-        "image": "https://placeimg.com/640/480",
-        "created_at": "2019-03-24T18:25:43.511Z"
-        }
+  load product details
+  return response with 200 code with following response:
+  {
+    "product": {
+      "id": 123,
+      "title": "Some new product",
+      "price": "12.76",
+      "image": "https://placeimg.com/640/480",
+      "created_at": "2019-03-24T18:25:43.511Z"
     }
-  else
-    return 404 response with empty response body
+  }
   ```
 
 ## As a logged in user, I add a product to the list my favorite products
@@ -65,10 +63,29 @@
   load current user
   
   if user exists?
-    load product
+    load products from favorite list
+    [
+      {
+        "user_id": {
+          "3"
+        }
+        "prod_id": {
+          [123, 234, 543]
+        }
+      }
+    ]
+    
+    load new product
 
-    if product loaded?
-      save product in user favorite list
+      {
+        "product": {
+          "id": 321
+      }
+
+    check new product id with matching from favorite list
+
+    if matching not found
+      add product to favorite list
     else
       return 404 response with empty response body
   else
@@ -86,10 +103,10 @@
   load current user
    
   if user exists?
-    load product from user favorite list
+    load user favorite list
 
-    if product loaded?
-      delete product
+    if product list loaded?
+      delete product from favorite list
       return 200 code response 
     else
       return 404 response with empty response body
@@ -110,7 +127,8 @@
   if user exists?
     if user have favorite products
       load all visible products from user favorites
-      return response with 204 code with following response:
+      return response with 200 code with following response:
+      [  
         {
           "product": {
             "id": 123,
@@ -123,8 +141,9 @@
               ...
             }
         }
+      ]
     else
-      return 404 response with empty response body
+      return 200 response with empty response body
   else
     return 404 response with empty response body
   ```
@@ -143,6 +162,7 @@
     if current user is admin?
       load all products
       return response with 204 code with following response:
+      [
         {
           "product": {
             "id": 123,
@@ -155,6 +175,7 @@
               ...
             }
         }
+      ]
     else
       load products with parameter hide = false
   else
