@@ -7,28 +7,28 @@
 3. have a `GET /products` route on the server, that resolves to `ProductsController#index` action,
 4. in controller action:
 
-  ```
-  select all visible products
-  
-  load products
-  return response with 204 code with following response:
-  [
-    {
-      "product": {
-        "id": 123,
-        "title": "Some new product",
-        "price": "12.76",
-        "image": "https://placeimg.com/640/480",
-        "created_at": "2019-03-24T18:25:43.511Z"
-        },
-        {
-          ...
-        }
-    }
-  ]
-  if products < 1
-    return 200 response with empty response body {}
-  ```
+    ```
+    select all visible products
+
+    load products
+    return response with 204 code with following response:
+    [
+      {
+        "product": {
+          "id": 123,
+          "title": "Some new product",
+          "price": "12.76",
+          "image": "https://placeimg.com/640/480",
+          "created_at": "2019-03-24T18:25:43.511Z"
+          },
+          {
+            ...
+          }
+      }
+    ]
+    if products < 1
+      return 200 response with empty response body {}
+    ```
 
 ## As a user, I see a single product with details
 
@@ -37,20 +37,22 @@
 3. have a `GET /products/:id` route on the server, that resolves to `ProductsController#show` action,
 4. in controller action:
   
-  ```
-  select visible product
-  load product details
-  return response with 200 code with following response:
-  {
-    "product": {
-      "id": 123,
-      "title": "Some new product",
-      "price": "12.76",
-      "image": "https://placeimg.com/640/480",
-      "created_at": "2019-03-24T18:25:43.511Z"
-    }
-  }
-  ```
+    ```
+    select visible product
+    if product exist?
+      return response with 200 code with following response:
+      {
+        "product": {
+          "id": 123,
+          "title": "Some new product",
+          "price": "12.76",
+          "image": "https://placeimg.com/640/480",
+          "created_at": "2019-03-24T18:25:43.511Z"
+        }
+      }
+    else
+      return 404 response with empty response body
+    ```
 
 ## As a logged in user, I add a product to the list my favorite products
 
@@ -59,38 +61,20 @@
 3. have a `POST /products/:id/favorite` route on the server, that resolves to `FavoritesController#create` action,
 4. in controller action:
 
-  ```
-  load current user
-  
-  if user exists?
-    load products from favorite list
-    [
-      {
-        "user_id": {
-          "3"
-        }
-        "prod_id": {
-          [123, 234, 543]
-        }
-      }
-    ]
+    ```
+    load current user
     
-    load new product
-
-      {
-        "product": {
-          "id": 321
-      }
-
-    check new product id with matching from favorite list
-
-    if matching not found
-      add product to favorite list
+    if user exists?
+      if product exist?
+        if product unfavorite?
+          add product to user favorite list
+        else
+          return 404 response with empty response body 
+      else
+        return 404 response with empty response body 
     else
-      return 404 response with empty response body
-  else
-    return 404 response with empty response body 
-  ```
+      return 404 response with empty response body 
+    ```
 
 ## As a logged in user, I remove a product from the list my favorite products
 
