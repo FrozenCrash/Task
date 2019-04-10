@@ -66,6 +66,8 @@
     
     if user exists?
       if product exist?
+        check in DB, record with product_id and user_id
+
         if product unfavorite?
           add product to user favorite list
         else
@@ -88,10 +90,12 @@
      
     if user exists?
       if product exist?
+        check in DB, record with product_id and user_id
+
         if product favorite?
           unfavorite product from user favorite list
         else
-          return 404 response with empty response body
+        return 404 response with empty response body
       else
         return 404 response with empty response body
     else
