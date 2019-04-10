@@ -87,11 +87,11 @@
     load current user
      
     if user exists?
-      load user favorite list
-
-      if product list loaded?
-        delete product from favorite list
-        return 200 code response 
+      if product exist?
+        if product favorite?
+          unfavorite product from user favorite list
+        else
+          return 404 response with empty response body
       else
         return 404 response with empty response body
     else
