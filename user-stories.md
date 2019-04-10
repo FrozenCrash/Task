@@ -37,20 +37,22 @@
 3. have a `GET /products/:id` route on the server, that resolves to `ProductsController#show` action,
 4. in controller action:
   
-  ```
-  select visible product
-  load product details
-  return response with 200 code with following response:
-  {
-    "product": {
-      "id": 123,
-      "title": "Some new product",
-      "price": "12.76",
-      "image": "https://placeimg.com/640/480",
-      "created_at": "2019-03-24T18:25:43.511Z"
-    }
-  }
-  ```
+    ```
+    select visible product
+    if product exist?
+      return response with 200 code with following response:
+      {
+        "product": {
+          "id": 123,
+          "title": "Some new product",
+          "price": "12.76",
+          "image": "https://placeimg.com/640/480",
+          "created_at": "2019-03-24T18:25:43.511Z"
+        }
+      }
+    else
+      return 404 response with empty response body
+    ```
 
 ## As a logged in user, I add a product to the list my favorite products
 
