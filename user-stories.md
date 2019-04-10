@@ -83,20 +83,20 @@
 3. have a `DELETE /products/:id/unfavorite` route on the server, that resolves to `FavoritesController#destroy` action,
 4. in controller action:
     
-  ```
-  load current user
-   
-  if user exists?
-    load user favorite list
+    ```
+    load current user
+     
+    if user exists?
+      load user favorite list
 
-    if product list loaded?
-      delete product from favorite list
-      return 200 code response 
+      if product list loaded?
+        delete product from favorite list
+        return 200 code response 
+      else
+        return 404 response with empty response body
     else
       return 404 response with empty response body
-  else
-    return 404 response with empty response body
-  ```
+    ```
 
 ## As a logged in user, I see a list of my favorite products
 
@@ -105,32 +105,32 @@
 3. have a `GET /favorites` route on the server, that resolves to `FavoritesController#index` action,
 4. in controller action:
   
-  ```
-  load current user
-       
-  if user exists?
-    if user have favorite products
-      load all visible products from user favorites
-      return response with 200 code with following response:
-      [  
-        {
-          "product": {
-            "id": 123,
-            "title": "Some new product",
-            "price": "12.76",
-            "image": "https://placeimg.com/640/480",
-            "created_at": "2019-03-24T18:25:43.511Z"
-            },
-            {
-              ...
-            }
-        }
-      ]
+    ```
+    load current user
+         
+    if user exists?
+      if user have favorite products
+        load all visible products from user favorites
+        return response with 200 code with following response:
+        [  
+          {
+            "product": {
+              "id": 123,
+              "title": "Some new product",
+              "price": "12.76",
+              "image": "https://placeimg.com/640/480",
+              "created_at": "2019-03-24T18:25:43.511Z"
+              },
+              {
+                ...
+              }
+          }
+        ]
+      else
+        return 200 response with empty response body
     else
-      return 200 response with empty response body
-  else
-    return 404 response with empty response body
-  ```
+      return 404 response with empty response body
+    ```
 
 ## As an admin, I see all products
 
@@ -139,32 +139,32 @@
 3. have a `GET /products` route on the server, that resolves to `ProductsController#index` action,
 4. In controller action:
 
-  ```
-  load current user
-     
-  if user exists?
-    if current user is admin?
-      load all products
-      return response with 204 code with following response:
-      [
-        {
-          "product": {
-            "id": 123,
-            "title": "Some new product",
-            "price": "12.76",
-            "image": "https://placeimg.com/640/480",
-            "created_at": "2019-03-24T18:25:43.511Z"
-            },
-            {
-              ...
-            }
-        }
-      ]
+    ```
+    load current user
+       
+    if user exists?
+      if current user is admin?
+        load all products
+        return response with 204 code with following response:
+        [
+          {
+            "product": {
+              "id": 123,
+              "title": "Some new product",
+              "price": "12.76",
+              "image": "https://placeimg.com/640/480",
+              "created_at": "2019-03-24T18:25:43.511Z"
+              },
+              {
+                ...
+              }
+          }
+        ]
+      else
+        load products with parameter hide = false
     else
       load products with parameter hide = false
-  else
-    load products with parameter hide = false
-  ```
+    ```
 
 ## As an admin, I add a product
 
@@ -173,27 +173,27 @@
 3. have a `POST /products` route on the server, that resolves to `ProductsController#create` action,
 4. in controller action:
 
-  ```
-  load current user
- 
-  if user exists?
-    if current user is admin?
-      if all validates is true
-        * price product valid (price > 0) ?
-        * title product uniq?
-        * product have image (extansion image must be "jpeg") ? 
-        * correct image URL?
-        create new product
+    ```
+    load current user
+   
+    if user exists?
+      if current user is admin?
+        if all validates is true
+          * price product valid (price > 0) ?
+          * title product uniq?
+          * product have image (extansion image must be "jpeg") ? 
+          * correct image URL?
+          create new product
+        else
+          return response with 422 code and validation errors in response body:
+              {
+                ...
+              }
       else
-        return response with 422 code and validation errors in response body:
-            {
-              ...
-            }
+        return 404 (401 - Unauthorized) response with empty response body
     else
-      return 404 (401 - Unauthorized) response with empty response body
-  else
-    return 404 (403 - Forbidden) response with empty response body 
-  ```
+      return 404 (403 - Forbidden) response with empty response body 
+    ```
 
 ## As an admin, I remove a product
 
@@ -203,23 +203,23 @@
 4. issue a `DELETE /products/:id` to the server:
 5. in controller action:
     
-  ```
-  load current user
- 
-  if user exists?
-    if current user is admin?
-      load product 
+    ```
+    load current user
+   
+    if user exists?
+      if current user is admin?
+        load product 
 
-      if product loaded?
-        delete product
-        return 200 code response 
+        if product loaded?
+          delete product
+          return 200 code response 
+        else
+          return 404 response with empty response body
       else
         return 404 response with empty response body
     else
       return 404 response with empty response body
-  else
-    return 404 response with empty response body
-  ```
+    ```
 
 ## As an admin, I update a product
 
@@ -229,39 +229,39 @@
 4. issue a `PATCH /products/:id` to the server:
 5. in controller action:
     
-  ```
-  load current user
+    ```
+    load current user
 
-  if user exists?
-    if current user is admin?
-      load product
-       
-      if product loaded?
-        apply new product params
-        validate product
+    if user exists?
+      if current user is admin?
+        load product
+         
+        if product loaded?
+          apply new product params
+          validate product
 
-        if product valid?
-          update product in database         
-          return response with 204 code with following response:
-            {
-              "product": {
-                "id": 123,
-                "title": "Some new product",
-                "price": "12.76",
-                "image": "https://placeimg.com/640/480",
-                "created_at": "2019-03-24T18:25:43.511Z"
+          if product valid?
+            update product in database         
+            return response with 204 code with following response:
+              {
+                "product": {
+                  "id": 123,
+                  "title": "Some new product",
+                  "price": "12.76",
+                  "image": "https://placeimg.com/640/480",
+                  "created_at": "2019-03-24T18:25:43.511Z"
+                }
               }
-            }
 
+          else
+            return response with 422 code and validation errors in response body:
+              {
+                ...
+              }
         else
-          return response with 422 code and validation errors in response body:
-            {
-              ...
-            }
+          return 404 response with empty response body
       else
         return 404 response with empty response body
     else
       return 404 response with empty response body
-  else
-    return 404 response with empty response body
-  ```
+    ```
