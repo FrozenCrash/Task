@@ -61,38 +61,20 @@
 3. have a `POST /products/:id/favorite` route on the server, that resolves to `FavoritesController#create` action,
 4. in controller action:
 
-  ```
-  load current user
-  
-  if user exists?
-    load products from favorite list
-    [
-      {
-        "user_id": {
-          "3"
-        }
-        "prod_id": {
-          [123, 234, 543]
-        }
-      }
-    ]
+    ```
+    load current user
     
-    load new product
-
-      {
-        "product": {
-          "id": 321
-      }
-
-    check new product id with matching from favorite list
-
-    if matching not found
-      add product to favorite list
+    if user exists?
+      if product exist?
+        if product unfavorite?
+          add product to user favorite list
+        else
+          return 404 response with empty response body 
+      else
+        return 404 response with empty response body 
     else
-      return 404 response with empty response body
-  else
-    return 404 response with empty response body 
-  ```
+      return 404 response with empty response body 
+    ```
 
 ## As a logged in user, I remove a product from the list my favorite products
 
