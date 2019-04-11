@@ -71,7 +71,7 @@
         if product unfavorite?
           add product to user favorite list
         else
-          return 404 response with empty response body 
+        return 404 response with empty response body 
       else
         return 404 response with empty response body 
     else
@@ -183,9 +183,11 @@
     if user exists?
       if current user is admin?
         if all validates is true
+          * product have title?
           * price product valid (price > 0) ?
           * title product uniq?
-          * product have image (extansion image must be "jpeg") ? 
+          * product have image?
+          * extansion image exist? 
           * correct image URL?
           create new product
         else
