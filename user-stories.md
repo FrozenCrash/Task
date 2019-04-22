@@ -11,21 +11,25 @@
     select all visible products
 
     load products
-    return response with 204 code with following response:
-    [
+    
+    if products list size > 0
+      return response with 204 code with following response:
       {
-        "id": 123,
-        "title": "Some new product",
-        "price": "12.76",
-        "image": "https://placeimg.com/640/480",
-        "created_at": "2019-03-24T18:25:43.511Z"
-      },
-      {
-        ...
+        "products": [
+          {
+            "id": 123,
+            "title": "Some new product",
+            "price": "12.76",
+            "image": "https://placeimg.com/640/480",
+            "created_at": "2019-03-24T18:25:43.511Z"
+          },
+          {
+            ...
+          }
+        ]
       }
-    ]
-    if products < 1
-      return 200 response with empty response body []
+    else
+      return 200 response with response body containing empty list []
     ```
 
 ## As a user, I see a single product with details
@@ -116,23 +120,24 @@
     load current user
          
     if user exists?
-      if user have favorite products
-        load all visible products from user favorites
+      load all visible favorite products from user
+      
+      if products list size > 0
         return response with 200 code with following response:
-        [  
-          {
-            "product": {
+        {
+          "products": [
+            {
               "id": 123,
               "title": "Some new product",
               "price": "12.76",
               "image": "https://placeimg.com/640/480",
               "created_at": "2019-03-24T18:25:43.511Z"
-              },
-              {
-                ...
-              }
-          }
-        ]
+            },
+            {
+              ...
+            }
+          ]
+        }
       else
         return 200 response with response body containing empty list []
     else
@@ -152,21 +157,25 @@
     if user exists?
       if current user is admin?
         load all products
-        return response with 204 code with following response:
-        [
+
+        if products list size > 0
+          return response with 204 code with following response:
           {
-            "product": {
-              "id": 123,
-              "title": "Some new product",
-              "price": "12.76",
-              "image": "https://placeimg.com/640/480",
-              "created_at": "2019-03-24T18:25:43.511Z"
+            "products": [
+              {
+                "id": 123,
+                "title": "Some new product",
+                "price": "12.76",
+                "image": "https://placeimg.com/640/480",
+                "created_at": "2019-03-24T18:25:43.511Z"
               },
               {
                 ...
               }
+            ]
           }
-        ]
+        else
+          return 200 response with response body containing empty list []
       else
         load products with parameter hide = false
     else
@@ -195,9 +204,9 @@
           create new product
         else
           return response with 422 code and validation errors in response body:
-              {
-                ...
-              }
+            {
+              ...
+            }
       else
         return 404 (401 - Unauthorized) response with empty response body
     else
