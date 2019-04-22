@@ -27,7 +27,7 @@
       }
     ]
     if products < 1
-      return 200 response with empty response body {}
+      return 200 response with empty response body []
     ```
 
 ## As a user, I see a single product with details
@@ -38,7 +38,8 @@
 4. in controller action:
   
     ```
-    select visible product
+    load visible product
+    
     if product exist?
       return response with 200 code with following response:
       {
@@ -73,7 +74,7 @@
         if product unfavorite?
           add product to user favorite list
         else
-        return 404 response with empty response body 
+          return 404 response with empty response body 
       else
         return 404 response with empty response body 
     else
@@ -99,7 +100,7 @@
         if product favorite?
           unfavorite product from user favorite list
         else
-        return 404 response with empty response body
+          return 404 response with empty response body
       else
         return 404 response with empty response body
     else
@@ -135,7 +136,7 @@
           }
         ]
       else
-        return 200 response with empty response body
+        return 200 response with response body containing empty list []
     else
       return 404 response with empty response body
     ```
