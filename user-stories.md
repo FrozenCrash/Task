@@ -75,6 +75,7 @@
 
         if product unfavorite?
           add product to user favorite list
+          return 200 code response with empty response body
         else
           return 404 response with empty response body 
       else
@@ -101,6 +102,7 @@
 
         if product favorite?
           unfavorite product from user favorite list
+          return 200 code response with empty response body
         else
           return 404 response with empty response body
       else
@@ -230,7 +232,7 @@
 
         if product loaded?
           delete product
-          return 200 code response 
+          return 200 code response with empty response body
         else
           return 404 response with empty response body
       else
