@@ -65,7 +65,9 @@
     load current user
     
     if user exists?
-      if visible product exists?
+      load visible product
+      
+      if product exists?
         check in DB, record with product_id and user_id
 
         if product unfavorite?
@@ -89,6 +91,8 @@
     load current user
      
     if user exists?
+      load visible product
+      
       if product exist?
         check in DB, record with product_id and user_id
 
