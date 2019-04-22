@@ -14,16 +14,14 @@
     return response with 204 code with following response:
     [
       {
-        "product": {
-          "id": 123,
-          "title": "Some new product",
-          "price": "12.76",
-          "image": "https://placeimg.com/640/480",
-          "created_at": "2019-03-24T18:25:43.511Z"
-          },
-          {
-            ...
-          }
+        "id": 123,
+        "title": "Some new product",
+        "price": "12.76",
+        "image": "https://placeimg.com/640/480",
+        "created_at": "2019-03-24T18:25:43.511Z"
+      },
+      {
+        ...
       }
     ]
     if products < 1
